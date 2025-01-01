@@ -34,7 +34,4 @@ public class Team {
 
     @Column(nullable = false)
     private Double amountOfMoney;
-
-    @Version
-    private Long version;
 }

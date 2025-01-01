@@ -31,7 +31,4 @@ public class Player {
     @JsonBackReference
     @ToString.Exclude
     private Team team;
-
-    @Version
-    private Long version;
 }
