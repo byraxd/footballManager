@@ -62,21 +62,7 @@ public class TransferServiceImpl implements TransferService {
 
         ValidationUtils.validateDto(transferDto);
 
-        Player player = findPlayerById(transferDto.playerId());
-        Team oldPlayerTeam = findTeamById(transferDto.fromTeamId());
-        Team newPlayerTeam = findTeamById(transferDto.toTeamId());
-
-        double playerCost = (player.getYearsOfExperience() * 100000)/player.getAge();
-        Double transferCost = playerCost * (1 + oldPlayerTeam.getCommissionForPlayer());
-
-        Transfer transfer = Transfer
-                .builder()
-                .status(TransferStatus.IN_PROGRESS)
-                .fromTeam(oldPlayerTeam)
-                .toTeam(newPlayerTeam)
-                .player(player)
-                .transferCost(transferCost)
-                .build();
+        Transfer transfer = createTransfer(transferDto);
 
         transferRepository.save(transfer);
         log.info("Saved transfer: {}", transfer);
@@ -90,23 +76,12 @@ public class TransferServiceImpl implements TransferService {
         log.info("Updating transfer: {}", transferDto);
 
         ValidationUtils.validateDto(transferDto);
-
         ValidationUtils.validateId(id);
+
         Transfer transferForUpdate = findTransferById(id);
+        Transfer updatedTransfer = updateTransfer(transferDto, transferForUpdate);
 
-        Player player = findPlayerById(transferDto.playerId());
-        Team oldPlayerTeam = findTeamById(transferDto.fromTeamId());
-        Team newPlayerTeam = findTeamById(transferDto.toTeamId());
-
-        double playerCost = (player.getYearsOfExperience() * 100000)/player.getAge();
-        Double transferCost = playerCost * (1 + oldPlayerTeam.getCommissionForPlayer());
-
-        transferForUpdate.setPlayer(player);
-        transferForUpdate.setFromTeam(oldPlayerTeam);
-        transferForUpdate.setToTeam(newPlayerTeam);
-        transferForUpdate.setTransferCost(transferCost);
-
-        transferRepository.save(transferForUpdate);
+        transferRepository.save(updatedTransfer);
         log.info("Updated transfer {}, by id {}", transferForUpdate, id);
 
         return transferForUpdate;
@@ -136,6 +111,13 @@ public class TransferServiceImpl implements TransferService {
 
         Transfer transfer = findTransferById(transferId);
 
+        completeTransfer(transfer);
+        log.info("Successfully payed for the transfer {}", transfer);
+
+        return transfer;
+    }
+
+    private void completeTransfer(Transfer transfer) {
         Player player = findPlayerById(transfer.getPlayer().getId());
 
         Team oldPlayerTeam = findTeamById(transfer.getFromTeam().getId());
@@ -162,9 +144,39 @@ public class TransferServiceImpl implements TransferService {
         teamRepository.save(newPlayerTeam);
 
         transferRepository.save(transfer);
-        log.info("Successfully payed for the transfer {}", transfer);
+    }
+
+    private Transfer updateTransfer(TransferDto transferDto, Transfer transfer) {
+        Player player = findPlayerById(transferDto.playerId());
+        Team oldPlayerTeam = findTeamById(transferDto.fromTeamId());
+        Team newPlayerTeam = findTeamById(transferDto.toTeamId());
+
+        double playerCost = (player.getYearsOfExperience() * 100000)/player.getAge();
+        Double transferCost = playerCost * (1 + oldPlayerTeam.getCommissionForPlayer());
+
+        transfer.setPlayer(player);
+        transfer.setFromTeam(oldPlayerTeam);
+        transfer.setToTeam(newPlayerTeam);
+        transfer.setTransferCost(transferCost);
 
         return transfer;
+    }
+
+    private Transfer createTransfer(TransferDto transferDto) {
+        Player player = findPlayerById(transferDto.playerId());
+        Team oldPlayerTeam = findTeamById(transferDto.fromTeamId());
+        Team newPlayerTeam = findTeamById(transferDto.toTeamId());
+
+        double playerCost = (player.getYearsOfExperience() * 100000)/player.getAge();
+        Double transferCost = playerCost * (1 + oldPlayerTeam.getCommissionForPlayer());
+
+        return Transfer.builder()
+                .player(player)
+                .fromTeam(oldPlayerTeam)
+                .toTeam(newPlayerTeam)
+                .transferCost(transferCost)
+                .status(TransferStatus.IN_PROGRESS)
+                .build();
     }
 
     private Player findPlayerById(Long id) {
