@@ -1,0 +1,240 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: buraxd
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: teams
+      changes:
+        - createTable:
+            tableName: teams
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: commission_for_player
+                  type: DOUBLE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: amount_of_money
+                  type: DOUBLE
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 2
+      author: buraxd
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: players
+      changes:
+        - createTable:
+            tableName: players
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: age
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: years_of_experience
+                  type: DOUBLE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: team_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 3
+      author: buraxd
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: players
+            baseColumnNames: team_id
+            referencedTableName: teams
+            referencedColumnNames: id
+            constraintName: fk_player_team
+            onDelete: CASCADE
+
+  - changeSet:
+      id: 4
+      author: buraxd
+      changes:
+        - insert:
+            tableName: teams
+            columns:
+              - column:
+                  name: name
+                  value: "Real Madrid"
+              - column:
+                  name: commission_for_player
+                  value: "0.10"
+              - column:
+                  name: amount_of_money
+                  value: "950000.00"
+              - column:
+                  name: name
+                  value: "Barcelona"
+              - column:
+                  name: commission_for_player
+                  value: "0.08"
+              - column:
+                  name: amount_of_money
+                  value: "800000.00"
+
+  - changeSet:
+      id: 5
+      author: buraxd
+      changes:
+        - insert:
+            tableName: players
+            columns:
+              - column:
+                  name: name
+                  value: "Cristiano Ronaldo"
+              - column:
+                  name: age
+                  value: "32"
+              - column:
+                  name: years_of_experience
+                  value: "12"
+              - column:
+                  name: team_id
+                  value: "1"
+
+  - changeSet:
+      id: 6
+      author: buraxd
+      changes:
+        - insert:
+            tableName: players
+            columns:
+              - column:
+                  name: name
+                  value: "Lionel Messi"
+              - column:
+                  name: age
+                  value: "29"
+              - column:
+                  name: years_of_experience
+                  value: "15"
+              - column:
+                  name: team_id
+                  value: "1"
+
+  - changeSet:
+      id: 7
+      author: buraxd
+      changes:
+        - insert:
+            tableName: teams
+            columns:
+              - column:
+                  name: name
+                  value: "Real Madrid"
+              - column:
+                  name: commission_for_player
+                  value: "0.10"
+              - column:
+                  name: amount_of_money
+                  value: "950000.00"
+
+  - changeSet:
+      id: 8
+      author: buraxd
+      changes:
+        - createTable:
+            tableName: transfers
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: player_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: from_team_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: to_team_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: transfer_cost
+                  type: DOUBLE
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 9
+      author: buraxd
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: transfers
+            baseColumnNames: player_id
+            referencedTableName: players
+            referencedColumnNames: id
+            constraintName: fk_transfer_player
+            onDelete: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: transfers
+            baseColumnNames: from_team_id
+            referencedTableName: teams
+            referencedColumnNames: id
+            constraintName: fk_transfer_from_team
+            onDelete: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: transfers
+            baseColumnNames: to_team_id
+            referencedTableName: teams
+            referencedColumnNames: id
+            constraintName: fk_transfer_to_team
+            onDelete: CASCADE

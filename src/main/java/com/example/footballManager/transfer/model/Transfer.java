@@ -36,9 +36,6 @@ public class Transfer {
     @JoinColumn(name = "toTeam_id", nullable = false)
     private Team toTeam;
 
-    @Column(nullable = false)
+    @Column(name = "transferCost", nullable = false)
     private Double transferCost;
-
-    @Version
-    private Long version;
 }
