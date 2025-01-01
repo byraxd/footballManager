@@ -12,6 +12,7 @@ import com.example.footballManager.utils.ValidationUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -49,6 +50,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
+    @Transactional
     public Player save(PlayerDto playerDto) {
         log.info("Saving player: {}", playerDto);
 
@@ -74,6 +76,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
+    @Transactional
     public Player updateById(Long id, PlayerDto playerDto) {
         log.info("Updating player: {}", playerDto);
 
@@ -103,6 +106,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         log.info("Deleting player by id: {}", id);
         ValidationUtils.validateId(id);
